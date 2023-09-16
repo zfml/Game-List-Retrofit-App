@@ -1,4 +1,4 @@
-package com.example.gameapp.screen.gameList
+package com.example.gameapp.ui.screen.gameList
 
 import android.util.Log
 import androidx.compose.runtime.MutableState
@@ -23,18 +23,22 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.io.IOException
+import java.util.Objects
 import javax.inject.Inject
 
-data class GameListUiState(
-    val gameList: List<GameModel> = emptyList()
-)
-
+sealed interface GameUiState {
+    object Loading: GameUiState
+    data class Success(val list: List<GameModel>): GameUiState
+    object Error: GameUiState
+}
 
 @HiltViewModel
 class GameListViewModel @Inject constructor(
     private val gameRepository: GameRepository
 ): ViewModel(){
-     var gameListUiState: GameListUiState by mutableStateOf(GameListUiState(emptyList()))
+     var gameUiState: GameUiState by mutableStateOf(GameUiState.Loading)
          private set
 
 
@@ -43,8 +47,18 @@ class GameListViewModel @Inject constructor(
     }
     fun getAllGames() {
         viewModelScope.launch{
-            Log.d("GAMELIST",gameRepository.getAllGames().toString())
-           gameListUiState = GameListUiState(gameList = gameRepository.getAllGames())
+            gameUiState = GameUiState.Loading
+
+            try {
+                gameUiState = GameUiState.Success(gameRepository.getAllGames())
+            } catch (e: IOException) {
+                gameUiState = GameUiState.Error
+            } catch (e: HttpException) {
+                gameUiState = GameUiState.Error
+            }
+
+
+
         }
     }
 

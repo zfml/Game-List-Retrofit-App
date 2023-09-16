@@ -1,6 +1,7 @@
 package com.example.gameapp.di
 
 import com.example.gameapp.data.network.GameApi
+import com.example.gameapp.repository.GameRepository
 import com.example.gameapp.util.Constants.BASE_URL
 import dagger.Module
 import dagger.Provides
@@ -28,5 +29,6 @@ object AppModule {
     fun provideGameApi(retrofit: Retrofit): GameApi {
         return retrofit.create(GameApi::class.java)
     }
+
 
 }

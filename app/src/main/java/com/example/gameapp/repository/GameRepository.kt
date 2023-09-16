@@ -18,6 +18,12 @@ class GameRepository @Inject constructor(
         }
      }
 
+    suspend fun getGameById(id: Int): GameModel {
+        return withContext(Dispatchers.IO) {
+            gameApi.getGameById(id)
+        }
+    }
+
 
 
 
