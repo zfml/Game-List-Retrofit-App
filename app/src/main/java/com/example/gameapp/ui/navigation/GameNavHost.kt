@@ -49,7 +49,11 @@ fun GameNavHost(
                 }
             )
         ) {
-            GameDetailScreen()
+            GameDetailScreen(
+                navigateToGamesList = {
+                    navController.popBackStack()
+                }
+            )
         }
     }
 }

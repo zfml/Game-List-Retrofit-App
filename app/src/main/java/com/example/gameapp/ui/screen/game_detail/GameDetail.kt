@@ -5,7 +5,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -24,6 +28,7 @@ import coil.request.ImageRequest
 fun GameDetailScreen(
     modifier: Modifier = Modifier,
     viewModel: GameDetailViewModel = hiltViewModel(),
+    navigateToGamesList: () -> Unit
 ) {
     val gameDetailUiState = viewModel.gameUiState
     Scaffold (
@@ -31,6 +36,14 @@ fun GameDetailScreen(
             TopAppBar(
                 title = {
                     Text(text = gameDetailUiState.gameDetail.title)
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navigateToGamesList()}) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back to GamesListScreen"
+                        )
+                    }
                 }
             )
         },
@@ -43,10 +56,10 @@ fun GameDetailScreen(
             ){
                 AsyncImage(
                     model = ImageRequest.Builder(context = LocalContext.current).data(gameDetailUiState.gameDetail.thumbnail)
-                        .crossfade(true)
                         .build()
                     ,
                     contentDescription = "Game Image",
+
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(194.dp)
