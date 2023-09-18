@@ -19,6 +19,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleCoroutineScope
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.gameapp.R
 import com.example.gameapp.model.GameModel
 import com.example.gameapp.ui.screen.components.GameItem
@@ -31,7 +34,7 @@ fun GameScreen(
     viewModel: GameListViewModel = hiltViewModel(),
     navigateToDetailGameScreen:(Int) -> Unit
 ) {
-    val gameListUiState = viewModel.gameUiState
+    val gameUiState = viewModel.uiState.collectAsStateWithLifecycle()
     
     Scaffold(
         topBar = {
@@ -40,27 +43,28 @@ fun GameScreen(
                    Text(text = "Games")
                }
            )
-        },
-        content = { innerPadding ->
-            Column(modifier = Modifier
+        }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
-            ) {
-                when(gameListUiState) {
-                    GameUiState.Error -> ErrorScreen(onRetryClicked = viewModel::getAllGames)
-                    GameUiState.Loading -> LoadingScreen()
-                    is GameUiState.Success ->
-                        GameListScreen(
-                        gameList = gameListUiState.list,
+        ) {
+
+            when(gameUiState.value) {
+                 GameUiState.Error -> ErrorScreen(onRetryClicked = viewModel::getAllGames)
+                 GameUiState.Loading -> LoadingScreen()
+                is GameUiState.Success ->
+                    GameListScreen(
+                        gameList = (gameUiState.value as GameUiState.Success).list,
                         navigateToDetailGameScreen = navigateToDetailGameScreen
                     )
-                }
             }
-            
+
+
         }
-    ) 
 
-
+    }
 
 
 }

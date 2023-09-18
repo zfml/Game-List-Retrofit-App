@@ -3,6 +3,7 @@ package com.example.gameapp.repository
 import com.example.gameapp.data.network.GameApi
 import com.example.gameapp.model.GameModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flow
@@ -17,6 +18,14 @@ class GameRepository @Inject constructor(
             gameApi.getAllGames()
         }
      }
+
+
+    val latestAllGames: Flow<List<GameModel>> = flow {
+        while (true) {
+            val allGames = gameApi.getAllGames()
+            emit(allGames)
+        }
+    }
 
     suspend fun getGameById(id: Int): GameModel {
         return withContext(Dispatchers.IO) {

@@ -14,6 +14,8 @@ import com.example.gameapp.repository.GameRepository
 import com.example.gameapp.util.Constants.TIME_OUT_MILLIS
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -29,17 +31,17 @@ import java.util.Objects
 import javax.inject.Inject
 
 sealed interface GameUiState {
-    object Loading: GameUiState
-    data class Success(val list: List<GameModel>): GameUiState
+    object Loading : GameUiState
+    data class Success(val list: List<GameModel>) : GameUiState
     object Error: GameUiState
 }
-
 @HiltViewModel
 class GameListViewModel @Inject constructor(
     private val gameRepository: GameRepository
 ): ViewModel(){
-     var gameUiState: GameUiState by mutableStateOf(GameUiState.Loading)
-         private set
+
+    private val _uiState: MutableStateFlow<GameUiState>  = MutableStateFlow(GameUiState.Success(emptyList()))
+    val uiState: StateFlow<GameUiState> = _uiState
 
 
     init {
@@ -47,14 +49,28 @@ class GameListViewModel @Inject constructor(
     }
     fun getAllGames() {
         viewModelScope.launch{
-            gameUiState = GameUiState.Loading
+
+
+            _uiState.value = GameUiState.Loading
 
             try {
-                gameUiState = GameUiState.Success(gameRepository.getAllGames())
+
+                gameRepository.latestAllGames
+                    .collect{ allGames ->
+                        _uiState.value = GameUiState.Success(allGames)
+                    }
+
+
+
+//                gameUiState = GameUiState.Success(gameRepository.getAllGames())
+
+
             } catch (e: IOException) {
-                gameUiState = GameUiState.Error
+                _uiState.value = GameUiState.Error
+
             } catch (e: HttpException) {
-                gameUiState = GameUiState.Error
+                _uiState.value = GameUiState.Error
+
             }
 
 
