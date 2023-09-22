@@ -41,7 +41,7 @@ class GameListViewModel @Inject constructor(
 ): ViewModel(){
 
     private val _uiState: MutableStateFlow<GameUiState>  = MutableStateFlow(GameUiState.Success(emptyList()))
-    val uiState: StateFlow<GameUiState> = _uiState
+    val uiState: StateFlow<GameUiState> = _uiState.asStateFlow()
 
 
     init {

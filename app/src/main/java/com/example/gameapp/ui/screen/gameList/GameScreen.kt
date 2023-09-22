@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -53,7 +54,7 @@ fun GameScreen(
 
             when(gameUiState.value) {
                  GameUiState.Error -> ErrorScreen(onRetryClicked = viewModel::getAllGames)
-                 GameUiState.Loading -> LoadingScreen()
+                 GameUiState.Loading -> LoadingScreen(modifier = Modifier.fillMaxSize())
                 is GameUiState.Success ->
                     GameListScreen(
                         gameList = (gameUiState.value as GameUiState.Success).list,
@@ -92,10 +93,15 @@ fun GameListScreen(
 fun LoadingScreen(
     modifier: Modifier = Modifier
 ) {
-    Image(
-        painter = painterResource(id = R.drawable.loading_img) ,
-        contentDescription = "Loading Images"
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     )
+    {
+        CircularProgressIndicator()
+    }
+
 }
 
 @Composable
@@ -104,7 +110,9 @@ fun ErrorScreen(
     onRetryClicked: () -> Unit
 ) {
    Column(
-       modifier = modifier,
+       modifier = modifier
+           .fillMaxSize()
+       ,
        horizontalAlignment = Alignment.CenterHorizontally,
        verticalArrangement = Arrangement.Center
    ) {
